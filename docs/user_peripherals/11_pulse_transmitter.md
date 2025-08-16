@@ -315,6 +315,8 @@ A series of examples intended to be used with the above is presented.
 #### [Example] NEC Remote Control Procotol
 This protocol uses pulse distance encoding, and requires 38kHz modulation which is simple enough. However, there needs to be a 9 ms high, and 4.5ms low pulse to initiate the transmission. This can be handled by the auxillary mask. In this example, you should expect a command of value 88 (integer) to be sent to address 36 (integer) every 500ms.
 
+![NEC Remote Control Procotol Timing Diagram](11_pulse_transmitter_NEC.drawio.svg)
+
 ```
 int main() {
     uint8_t address = 36;
@@ -427,6 +429,8 @@ int main() {
 #### [Example] WS2812B Addressable LED
 The WS2812B needs the bits to be sent MSB (Most Significant Bit) first. Reversing the bits using the CPU is highly inefficient (at least without the bit reverse instruction). Thankfully, we can take advantage of a trick where program counter can count down instead, this effectively sends the bits in reverse. In this example, you should expect 2 connected WS2812B LEDs to light up and animate between colours.
 
+![WS2812B Addressable LED Timing Diagram](11_pulse_transmitter_WS2812B.drawio.svg)
+
 ```
 int main() {
     // Enable all outputs (ensure they are not in debug mode)
@@ -491,7 +495,7 @@ int main() {
     *(volatile uint32_t *)(PULSE_TRANSMITTER_ADDRESS + 8) = reg_2.val;
 
     while(true) {
-    for (int t = 0; t < 255; t++) {
+        for (int t = 0; t < 255; t++) {
             // you can use this for testing as the code for HsvToRgb was obtained online
             //uint32_t color = t;  // animated blue
 
@@ -502,7 +506,7 @@ int main() {
  
             RgbColor rgb = HsvToRgb(hsv);
 
-            uint32_t color = (rgb.b << 16) | rgb.r << 8 | rgb.g;
+            uint32_t color = (rgb.g << 16) | rgb.r << 8 | rgb.b;
              
             *(volatile uint32_t *)(PULSE_TRANSMITTER_ADDRESS + 32) = color;
 
@@ -519,6 +523,8 @@ int main() {
 
 #### [Extra Example] Driving Serial Devices like the 74HC595 Shift Register / SPI Mode 0 Devices
 While the pulse transmitter peripheral is only single channel, signals like the carrier output is exposed. Since both the carrier timer and the program counter uses the same clock, in some scenarios, the carrier output may be repurposed as a clock signal for the 74HC595 Shift Register. The serial data in the program data memory can streamed out. In this example, you should expect the 8 shift register outputs to count in a binary sequence. 
+
+![74HC595 Timing Diagram](11_pulse_transmitter_74HC595.drawio.svg)
 
 ![Pulse Transmitter 74HC595 Shift Register Example](11_pulse_transmitter_74HC595.jpg)
 
